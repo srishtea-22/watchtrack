@@ -1,7 +1,7 @@
 "use client";
 import "@fontsource/poppins";
 import Link from "next/link";
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import { Label } from "@/components/label";
 import { Input } from "@/components/input";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const [username, setUsername] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -20,7 +21,9 @@ export default function LoginForm() {
     });
 
     const data = await res.json();
+    localStorage.setItem("userId", data.user._id);
     console.log(data);
+    router.push("/player")
   }
 
   return (
