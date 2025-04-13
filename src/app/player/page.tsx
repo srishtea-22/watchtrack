@@ -106,7 +106,10 @@ export default function player() {
             </Link>
             <div className="ml-30 mt-3">
               <h1 className="text-3xl font-[Poppins] font-semibold">Lecture Title</h1>
-                <p className="text-md font-[Poppins] mt-1">Progress: {Math.floor(progress)}%</p>
+              <div className="mt-4 h-2 w-full bg-gray-700 rounded-full relative">
+                <div className="absolute top-0 left-0 h-full bg-green-500 rounded-full" style={{ width: `${progress}%` }}></div>
+              </div>
+              <p className="text-md font-[Poppins] mt-1">Progress: {Math.floor(progress)}%</p>
             </div>
           <div className="w-10" />
         </div>
