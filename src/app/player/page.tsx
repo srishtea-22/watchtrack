@@ -19,7 +19,7 @@ export default function player() {
     const storedUserId = localStorage.getItem("userId");
     setUserId(storedUserId);
 
-    const response = await fetch("http://localhost:8080/api/progress", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -87,7 +87,7 @@ export default function player() {
   useEffect(() => {
     const userId = localStorage.getItem('userId');
     const fetchProgress = async () => {
-      const res = await fetch(`http://localhost:8080/api/progress?userId=${userId}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/progress?userId=${userId}`);
       if (!res.ok) return;
       const data = await res.json();
       setProgress(data.totalProgress);
