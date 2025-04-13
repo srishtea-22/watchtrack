@@ -6,13 +6,18 @@ import { useState, useEffect, useRef } from "react";
 export default function player() {
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const userId = localStorage.getItem("userId");
-  console.log(userId);
+  const [userId, setUserId] = useState<string | null>(null);
+  const watchedRanges = useRef<Array<[number, number]>>([]);
+  const lastTime = useRef<number>(0);
+
   
   const updateProgress = async () => {
     const video = videoRef.current;
     const currentTime = video?.currentTime || 0;
     const videoLength = video?.duration || 0;
+    
+    const storedUserId = localStorage.getItem("userId");
+    setUserId(storedUserId);
 
     const response = await fetch("http://localhost:8080/api/progress", {
       method: "POST",
@@ -20,10 +25,11 @@ export default function player() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        userId: userId,  
+        userId: storedUserId,  
         videoId: "oceans",  
         lastWatched: currentTime,
-        videoLength: videoLength
+        videoLength: videoLength,
+        watchedSegments: watchedRanges.current
       }),
     });
 
@@ -33,19 +39,48 @@ export default function player() {
       console.log("Failed to update progress.");
     }
   };
+  const debounce = (func: Function, delay: number) => {
+    let timeoutId: any;
+    return (...args: any[]) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func(...args), delay);
+    };
+  };
+  
+  const debouncedUpdateProgress = useRef(debounce(updateProgress, 500)).current;
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     const handleTimeUpdate = () => {
-      updateProgress();  
+      const currentTime = video.currentTime;
+    
+      if (currentTime > lastTime.current && currentTime - lastTime.current < 2) {
+        if (
+          watchedRanges.current.length === 0 ||
+          watchedRanges.current[watchedRanges.current.length - 1][1] !== lastTime.current
+        ) {
+          watchedRanges.current.push([lastTime.current, currentTime]);
+        } else {
+          watchedRanges.current[watchedRanges.current.length - 1][1] = currentTime;
+        }
+      }
+    
+      lastTime.current = currentTime;
+      debouncedUpdateProgress();
+    };
+    
+    const handleSeeked = () => {
+      lastTime.current = video.currentTime; 
     };
 
     video.addEventListener("timeupdate", handleTimeUpdate);
+    video.addEventListener("seeked", handleSeeked);
 
     return () => {
       video.removeEventListener("timeupdate", handleTimeUpdate);
+      video.removeEventListener("seeked", handleSeeked);
     };
   }, []);
 
