@@ -9,7 +9,7 @@ export default function player() {
   const [userId, setUserId] = useState<string | null>(null);
   const watchedRanges = useRef<Array<[number, number]>>([]);
   const lastTime = useRef<number>(0);
-
+  const [progress, setProgress] = useState(0);
   
   const updateProgress = async () => {
     const video = videoRef.current;
@@ -90,6 +90,7 @@ export default function player() {
       const res = await fetch(`http://localhost:8080/api/progress?userId=${userId}`);
       if (!res.ok) return;
       const data = await res.json();
+      setProgress(data.totalProgress);
       if (videoRef.current) {
         videoRef.current.currentTime = data.lastWatched;
       }
@@ -103,7 +104,10 @@ export default function player() {
             <Link href={"/login"}>
                 <button className="font-[Poppins] text-base text-white cursor-pointer mt-3 hover:text-blue-400"> &lt; Back</button>
             </Link>
-          <h1 className="text-3xl font-[Poppins] font-semibold ml-30 mt-3">Lecture Title</h1>
+            <div className="ml-30 mt-3">
+              <h1 className="text-3xl font-[Poppins] font-semibold">Lecture Title</h1>
+                <p className="text-md font-[Poppins] mt-1">Progress: {Math.floor(progress)}%</p>
+            </div>
           <div className="w-10" />
         </div>
 
