@@ -17,7 +17,7 @@ This is the frontend of the WatchTrack project, built with Next.js, Tailwind CSS
 - Custom video player using Video.js  
 - Tracks watched video intervals  
 - Sends watch data to the backend  
-- Displays unique progress  
+- User must refresh the page to see updated progress
 
 ## Design 
 
