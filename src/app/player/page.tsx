@@ -83,6 +83,19 @@ export default function player() {
       video.removeEventListener("seeked", handleSeeked);
     };
   }, []);
+  
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    const fetchProgress = async () => {
+      const res = await fetch(`http://localhost:8080/api/progress?userId=${userId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (videoRef.current) {
+        videoRef.current.currentTime = data.lastWatched;
+      }
+    };
+    fetchProgress();
+  }, []);
 
  return (
     <div className="min-h-screen bg-black text-white flex flex-col p-4">
